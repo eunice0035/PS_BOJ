@@ -1,64 +1,61 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+int board[502][502];
+int vis[502][502];
+int d_row[4] = {1,0,-1,0};
+int d_col[4] = {0,1,0,-1};
+int n,m;
 
-int board[501][501];
-bool vis[501][501];
-int dx[4] = { 0,1,0,-1 };
-int dy[4] = { 1,0,-1,0 };
+int bfs(int x, int y){
+    int size = 0;
+    queue<pair<int,int>> Q;
+    vis[x][y] = 1;
+    Q.push({x,y});
+
+    while(!Q.empty()){
+        size++;
+        pair<int,int> cur = Q.front();
+        Q.pop();
+        //cout << '(' << cur.first << ", " << cur.second << ") -> ";
+        for(int i=0; i<4; i++){
+            int row = cur.first + d_row[i];
+            int col = cur.second + d_col[i];
+
+            if(row < 0 || row >=n || col < 0 || col >= m) continue;
+            if(vis[row][col] || board[row][col] != 1) continue;
+            vis[row][col] = 1;
+            Q.push({row,col});
+        }
+    }
+    return size;
+}
 
 int main(void){
-    
     ios::sync_with_stdio(0);
     cin.tie(0);
-	int a, b;
-	cin >> a >> b;
-
-	for (int i = 0; i < a; i++) {
-		for (int j = 0; j < b; j++) {
-			cin >> board[i][j];
-		}
-	}
-	
-    queue<pair<int,int>> Q;
-	int count = 0;
-	int max = 0;
-	int area = 0;
-	for (int i = 0; i < a; i++) {
-		for (int j = 0; j < b; j++) {
-			if (board[i][j] == 1 && vis[i][j] == false) {
-				Q.push({ i, j });
-				vis[i][j] = true;
-				count++;
-			}
-
-			while (!Q.empty()) {
-				q = Q.front();
-				Q.pop();
-
-                area++;
-                int x = q.front().first;
-                int y = q.front().second;
-				
-				for (int k = 0; k < 4; k++) {
-                    int nx = x + dx[i];
-                    int ny = y + dy[i];
-					
-                    if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-					if (board[nx][ny] == 1 && vis[nx][ny] == false) {
-						Q.push({nx,ny});
-						vis[nx][ny] = true;
-					}
-				}
-			}
-			if (max < area) {
-				max = area;
-			}
-			area = 0;
-
-
-		}
-	}
-	cout << count << endl << max;
+    vector<int> sizeArr;
+    cin >> n >> m;
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            cin >> board[i][j];
+        }
+    }
     
+    int num_pic = 0;
+    int mx = 0;
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            if(board[i][j] == 1 && vis[i][j] == 0){
+                num_pic++;
+                sizeArr.push_back(bfs(i,j));
+                //cout << "cnt: " << num_pic << " size: " << sizeArr.back() << '\n';
+            }
+        }
+    }
+
+    if(sizeArr.size() != 0)
+        mx = *max_element(sizeArr.begin(), sizeArr.end());
+    
+    cout << num_pic << '\n' << mx;
 }
